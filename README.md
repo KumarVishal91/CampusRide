@@ -1,328 +1,100 @@
-# 🚗 CampusRide – University-Based Ride Sharing Platform
+# 🚖 CampusRide – Campus Cab Booking & Ride-Sharing Platform
 
-<p align="center">
-  A university-exclusive ride-sharing platform that connects students traveling in the same direction, making campus transportation easier, safer, and more convenient.
-</p>
+CampusRide is a campus-focused cab booking platform that allows students to book rides from one location to another within or around their university. Students can select pickup and drop-off locations, view nearby drivers on an interactive map, and request rides. Drivers can view incoming ride requests, accept suitable bookings, and navigate towards the pickup location.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/React-18-blue?logo=react" />
-  <img src="https://img.shields.io/badge/Node.js-Backend-green?logo=node.js" />
-  <img src="https://img.shields.io/badge/Express.js-API-black?logo=express" />
-  <img src="https://img.shields.io/badge/MongoDB-Database-green?logo=mongodb" />
-  <img src="https://img.shields.io/badge/Socket.IO-Realtime-black?logo=socket.io" />
-  <img src="https://img.shields.io/badge/License-MIT-blue" />
-</p>
-
----
-
-## 📌 Overview
-
-**CampusRide** is a full-stack ride-sharing web application built exclusively for university students.
-
-It provides a centralized platform where students can share available seats in their vehicles or request rides from other students traveling along similar routes.
-
-Unlike traditional ride-sharing platforms, CampusRide focuses on university communities. Registration is restricted to approved university email domains, helping ensure that the platform remains student-exclusive.
-
-The application supports ride offers, ride requests, real-time communication, notifications, interactive maps, and administrative moderation.
+The platform provides real-time GPS tracking, distance-based driver matching, and live ride updates to make campus transportation easier, faster, and more convenient.
 
 ## ✨ Key Features
 
-### 🔐 Authentication & Security
-- University email-based registration.
-- OTP verification through email.
-- JWT-based authentication and protected routes.
-- Password hashing using bcrypt.
-- Role-based access for students and administrators.
+### 👨‍🎓 Student / User
+- **User Authentication:** Secure registration and login using JWT-based authentication.
+- **Book a Ride:** Select pickup and destination locations to request a cab.
+- **Interactive Pickup Map:** Choose pickup and drop-off points using an interactive map.
+- **Nearby Driver Discovery:** Find available drivers based on their distance from the pickup location.
+- **Ride Requests:** Send ride requests to available drivers.
+- **Ride Status Tracking:** View ride status, including requested, accepted, ongoing, and completed.
+- **Live GPS Tracking:** Track the driver's real-time location after ride acceptance.
+- **Route and Direction Filters:** View and filter ride options based on pickup, destination, and route preferences.
+- **Notifications and Chat:** Receive ride updates and communicate through real-time messaging.
 
-### 🚘 Ride Management
-- Create and manage ride offers.
-- Publish ride requests when transportation is needed.
-- Specify vehicle details, available seats, pickup location, and destination.
-- Select travel direction: To Campus or From Campus.
-- Organize journeys using predefined routes (R1–R4).
-- Accept or reject incoming seat requests.
-- Complete accepted rides and earn reward points.
+### 🚗 Driver
+- **Driver Dashboard:** Manage availability and view incoming ride requests.
+- **Ride Offers:** Receive ride offers based on pickup location and distance.
+- **Accept / Reject Requests:** Choose whether to accept an incoming ride request.
+- **Location Sharing:** Share live GPS coordinates with the platform.
+- **Navigation:** View pickup and destination locations on the map.
+- **Ride Management:** Update ride status throughout the journey.
 
-### ⚡ Real-Time Communication
-- Real-time messaging using Socket.IO.
-- Instant ride notifications.
-- Live dashboard updates.
-- Chat between students to coordinate pickup and travel details.
+### 🛡️ Admin
+- **Admin Dashboard:** Monitor platform activity and registered users.
+- **User Management:** Manage student and driver accounts.
+- **Driver Management:** Monitor driver activity and availability.
+- **Ride Monitoring:** View and manage ride requests and their statuses.
+- **Platform Moderation:** Handle user-related issues and maintain platform operations.
 
-### 🗺️ Interactive Maps
-- Interactive maps powered by Leaflet.
-- OpenStreetMap integration.
-- Visualize pickup locations.
-- Help students coordinate meeting points.
+## 🔄 How It Works
 
-### 🏆 Leaderboard & Rewards
-- Points-based reward system.
-- Student leaderboard.
-- Top-three podium display.
-- Encourage participation and community engagement.
+1. **User Login:** A student logs into CampusRide using their account.
+2. **Select Locations:** The student chooses a pickup point and destination on the interactive map.
+3. **Find Nearby Drivers:** The system identifies available drivers near the pickup location using distance-based matching.
+4. **Send Ride Request:** The student submits a ride request with pickup and destination details.
+5. **Driver Accepts:** Available drivers receive ride offers and can accept the request.
+6. **Live Tracking:** After acceptance, the student can track the driver's live GPS location.
+7. **Complete Ride:** The driver updates the ride status after reaching the destination.
 
-### 👤 Profile Management
-- View and update personal profile information.
-- Manage student details.
-- Access ride-related activity.
+## 🛠️ Tech Stack
 
-### 🛡️ Admin Dashboard
-- View platform statistics.
-- Manage registered users.
-- Ban and unban accounts.
-- Moderate ride offers and requests.
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technologies |
+| Technology | Purpose |
 |---|---|
-| Frontend | React 18, Vite, React Router |
-| Styling & Icons | CSS, Lucide React |
-| HTTP Communication | Axios |
-| Backend | Node.js, Express.js |
-| Database | MongoDB, Mongoose |
-| Authentication | JWT, bcrypt |
-| Real-Time Communication | Socket.IO |
-| Email Service | Nodemailer |
-| Maps | Leaflet, OpenStreetMap |
+| React.js | Frontend user interface |
+| Node.js | Backend runtime |
+| Express.js | REST API development |
+| MongoDB | Database |
+| Socket.IO | Real-time communication, chat and ride updates |
+| Leaflet | Interactive maps and location visualization |
+| JWT | Authentication and authorization |
+| Cloudinary | Image upload and storage |
 
----
+## 🏗️ System Architecture
 
-## 🏗️ Application Architecture
+CampusRide follows a MERN-based client-server architecture.
 
-CampusRide follows a client-server architecture.
+- **Frontend:** Handles user interaction, location selection, maps, and ride dashboards.
+- **Backend:** Processes authentication, ride requests, driver matching, and ride management.
+- **Database:** Stores user, driver, and ride-related information.
+- **Real-Time Layer:** Uses Socket.IO to exchange live location updates, notifications, and messages.
+- **Map Integration:** Uses Leaflet to display pickup points, destinations, and driver locations.
 
-```text
-                  CAMPUSRIDE
-                      |
-          +-----------+-----------+
-          |                       |
-      React Client           Express Server
-          |                       |
-     React Router           REST API Routes
-          |                       |
-     Axios Requests        Middleware
-          |                       |
-     UI Components         Controllers
-          |                       |
-          |                   Mongoose
-          |                       |
-          |                    MongoDB
-          |
-          +------ Socket.IO ------+
-                     |
-              Real-Time Events
-                     |
-          Chat / Notifications /
-             Dashboard Updates
-```
+## 📍 Driver Matching Logic
 
-### Application Workflow
+CampusRide uses distance-based matching to identify suitable drivers for a ride request.
 
-1. A student registers using their university email.
-2. The email is verified through an OTP.
-3. The student logs in and accesses the dashboard.
-4. Students can publish ride offers or ride requests.
-5. Other students can discover relevant rides using route and direction filters.
-6. A student can request a seat in an available ride.
-7. The ride owner accepts or rejects the request.
-8. Students coordinate through real-time chat and notifications.
-9. Completed rides contribute to the student's reward points.
+1. Get the student's selected pickup coordinates.
+2. Retrieve drivers who are currently available.
+3. Calculate the distance between each available driver and the pickup location.
+4. Filter and prioritize drivers based on proximity.
+5. Send ride offers to suitable drivers.
+6. Update the ride once a driver accepts it.
 
----
+The matching approach was validated using 100+ simulated ride requests.
 
-## 📂 Project Structure
+## 🔐 Security and Access Control
 
-```text
-CampusRide/
-│
-├── client/
-│   ├── public/
-│   ├── src/
-│   │   ├── assets/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── context/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── .env.example
-│   └── package.json
-│
-├── server/
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── sockets/
-│   ├── utils/
-│   ├── .env.example
-│   └── package.json
-│
-├── docs/
-│   └── GUIDE.md
-│
-├── .gitignore
-└── README.md
-```
+- JWT-based authentication.
+- Role-based access for students, drivers, and admins.
+- Protected backend routes.
+- Input validation for ride-related requests.
+- Controlled access to role-specific features.
 
-*Note: The folder structure above is a logical overview. Adjust individual directory names if your actual source structure differs.*
+## 🚀 Future Improvements
 
----
+- Ride fare estimation based on distance.
+- Ride booking and scheduling.
+- Ride history and ratings.
+- Improved driver matching using traffic and estimated arrival time.
+- Emergency SOS and ride-sharing safety features.
 
-## ⚙️ Getting Started
+## 🎯 Project Objective
 
-Follow these steps to run CampusRide locally.
+The goal of CampusRide is to simplify campus transportation by connecting students with nearby drivers through a location-aware cab booking system. It combines interactive maps, distance-based matching, and real-time communication to provide a convenient ride-booking experience.
 
-### Prerequisites
-
-Make sure you have installed:
-
-- Node.js (v18 or above)
-- npm
-- MongoDB (Local installation or MongoDB Atlas)
-- Git
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/KumarVishal91/CampusRide.git
-
-cd CampusRide
-```
-
-### 2. Configure the Backend
-
-```bash
-cd server
-
-npm install
-```
-
-Create a `.env` file using `.env.example`.
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secure_jwt_secret
-```
-
-Add the email configuration variables required by your Nodemailer implementation.
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-Backend URL:
-
-```text
-http://localhost:5000
-```
-
-### 3. Configure the Frontend
-
-Open another terminal:
-
-```bash
-cd client
-
-npm install
-```
-
-Create a `.env` file using `.env.example` and configure the backend API URL.
-
-```env
-VITE_API_URL=http://localhost:5000
-```
-
-Start the frontend:
-
-```bash
-npm run dev
-```
-
-Frontend URL:
-
-```text
-http://localhost:5173
-```
-
-### 4. Development OTP
-
-During local development, the OTP is printed in the backend terminal.
-
-### 5. Admin Access
-
-To create an administrator account, update the user's role to `admin` in the MongoDB database.
-
----
-
-## 🔄 Core Modules
-
-| Module | Responsibility |
-|---|---|
-| Authentication | Registration, OTP verification, login |
-| Ride Offers | Create and manage available rides |
-| Ride Requests | Request seats and manage approvals |
-| Dashboard | Discover rides and filter by routes |
-| Real-Time Chat | Student-to-student communication |
-| Notifications | Inform users about ride activities |
-| Maps | Display pickup locations |
-| Leaderboard | Track points and student rankings |
-| Admin | User management and content moderation |
-
----
-
-## 🚀 Future Enhancements
-
-The following improvements are planned for future releases:
-
-- GPS-based geofence validation for ride directions.
-- Female-only ride preferences.
-- Browser push notifications.
-- Post-ride ratings and reviews.
-- User reporting and abuse detection.
-- Route-based and gender-based notification preferences.
-- Weekly and monthly leaderboard resets.
-- API rate limiting and enhanced request validation.
-- Automated testing and CI/CD integration.
-- Production deployment and monitoring.
-
----
-
-## 🎯 Project Goals
-
-CampusRide aims to:
-- Simplify transportation for university students.
-- Encourage students to share available vehicle seats.
-- Reduce individual transportation costs.
-- Improve coordination through real-time communication.
-- Build a trusted and student-exclusive transportation community.
-
----
-
-## 👨‍💻 Author
-
-**Vishal Kumar**
-
-B.Tech – Computer Science and Engineering (AI & ML)
-
-- GitHub: [KumarVishal91](https://github.com/KumarVishal91)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-<p align="center">
-  <b>Built to make campus commuting smarter, simpler, and more connected. 🚗</b>
-</p>
