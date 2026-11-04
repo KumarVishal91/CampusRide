@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>CampusRide</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+        <style>
+            :root {
+                --bg: #070b14;
+                --card: #0f1726;
+                --ink: #e8eef8;
+                --mut: #8a9bb2;
+                --line: #1f2d44;
+                --acc: #ffc21a;
+                --on-acc: #10151f;
+                --ok: #2ecc8f;
+                --bad: #ff5d6c;
+                --map: #0a1620;
+                --road: #1b2a3d;
+                --bld: #1a2a40;
+                --lab: #e8eef8;
+                color-scheme: dark;
+                box-sizing: border-box;
+                padding-top: env(safe-area-inset-top,0px);
+                padding-bottom: env(safe-area-inset-bottom,0px)
+            }
+
+            @media(prefers-color-scheme: dark) {
+                :root:not([data-theme="light"]) {
+                    --bg:#0e1522;
+                    --card: #17212f;
+                    --ink: #eaf0f8;
+                    --mut: #93a3b8;
+                    --line: #2a3749;
+                    --map: #18261f;
+                    --road: #2a3646;
+                    --bld: #25344a;
+                    --lab: #eaf0f8
+                }
+            }
+
+            :root[data-theme="dark"] {
+                --bg: #0e1522;
+                --card: #17212f;
+                --ink: #eaf0f8;
+                --mut: #93a3b8;
+                --line: #2a3749;
+                --map: #18261f;
+                --road: #2a3646;
+                --bld: #25344a;
+                --lab: #eaf0f8
+            }
+
+            * {
+                box-sizing: border-box
+            }
+
+            html {
+                scroll-padding-top: env(safe-area-inset-top,0px)
+            }
+
+            body {
+                margin: 0;
+                background: radial-gradient(900px 500px at 85% -10%,rgba(255,194,26,.11),transparent),radial-gradient(800px 500px at -10% 110%,rgba(46,204,143,.09),transparent),var(--bg);
+                background-attachment: fixed;
+                color: var(--ink);
+                font: 15px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif
+            }
+
+            header {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 22px;
+                background: rgba(10,16,28,.85);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--line);
+                color: #fff;
+                position: sticky;
+                top: 0;
+                z-index: 5
+            }
+
+            header b {
+                font-size: 22px;
+                font-weight: 800;
+                letter-spacing: -.02em
+            }
+
+            header b i {
+                font-style: normal;
+                background: var(--acc);
+                color: var(--on-acc);
+                padding: 0 7px;
+                border-radius: 6px;
+                margin-right: 6px
+            }
+
+            .tabs {
+                display: flex;
+                gap: 4px;
+                background: rgba(255,255,255,.12);
+                padding: 3px;
+                border-radius: 10px
+            }
+
+            .tabs button {
+                border: 0;
+                background: none;
+                color: #fff;
+                padding: 7px 14px;
+                border-radius: 8px;
+                font: inherit;
+                font-weight: 600;
+                cursor: pointer
+            }
+
+            .tabs button.on {
+                background: var(--acc);
+                color: var(--on-acc)
+            }
+
+            main {
+                display: grid;
+                grid-template-columns: minmax(0,1.6fr) minmax(300px,1fr);
+                gap: 16px;
+                padding: 16px 20px;
+                max-width: 1200px;
+                margin: auto
+            }
+
+            @media(max-width: 820px) {
+                main {
+                    grid-template-columns:1fr;
+                    padding: 12px
+                }
+            }
+
+            .card {
+                background: linear-gradient(180deg,rgba(255,255,255,.035),transparent),var(--card);
+                border: 1px solid var(--line);
+                border-radius: 18px;
+                padding: 18px;
+                box-shadow: 0 10px 30px rgba(0,0,0,.35)
+            }
+
+            h2 {
+                font-size: 18px;
+                margin: 0 0 10px;
+                font-weight: 800
+            }
+
+            h3 {
+                font-size: 14px;
+                margin: 14px 0 6px;
+                color: var(--mut);
+                font-weight: 600
+            }
+
+            .mapwrap {
+                padding: 0;
+                overflow: hidden
+            }
+
+            svg {
+                display: block;
+                width: 100%;
+                height: auto;
+                background: var(--map)
+            }
+
+            .pin {
+                cursor: pointer
+            }
+
+            .pin text {
+                fill: var(--lab);
+                font-size: 11px;
+                font-weight: 600;
+                paint-order: stroke;
+                stroke: var(--map);
+                stroke-width: 3px
+            }
+
+            .hint {
+                padding: 10px 16px;
+                font-size: 13px;
+                color: var(--mut);
+                border-top: 1px solid var(--line)
+            }
+
+            button.p,button.s {
+                font: inherit;
+                font-weight: 600;
+                border-radius: 9px;
+                padding: 9px 14px;
+                cursor: pointer;
+                border: 1px solid var(--line)
+            }
+
+            button.p {
+                background: linear-gradient(180deg,#ffd24d,var(--acc));
+                color: var(--on-acc);
+                border-color: var(--acc);
+                box-shadow: 0 4px 16px rgba(255,194,26,.28);
+                transition: transform .15s,box-shadow .15s
+            }
+
+            button.p:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 22px rgba(255,194,26,.4)
+            }
+
+            button.s {
+                background: rgba(255,255,255,.03);
+                color: var(--ink)
+            }
+
+            button.s:hover:not(:disabled) {
+                border-color: var(--acc)
+            }
+
+            button:disabled {
+                opacity: .45;
+                cursor: not-allowed
+            }
+
+            button:focus-visible,select:focus-visible,input:focus-visible {
+                outline: 2px solid var(--ink);
+                outline-offset: 2px
+            }
+
+            .row {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                align-items: center
+            }
+
+            .sp {
+                justify-content: space-between
+            }
+
+            .li {
+                display: flex;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 9px 0;
+                border-bottom: 1px solid var(--line)
+            }
+
+            .li:last-child {
+                border: 0
+            }
+
+            .tag {
+                font-size: 12px;
+                font-weight: 600;
+                padding: 2px 9px;
+                border-radius: 99px;
+                background: var(--bld);
+                color: var(--ink)
+            }
+
+            .tag.ok {
+                background: var(--ok);
+                color: #fff
+            }
+
+            .tag.bad {
+                background: var(--bad);
+                color: #fff
+            }
+
+            .tag.acc {
+                background: var(--acc);
+                color: var(--on-acc)
+            }
+
+            .steps {
+                display: flex;
+                gap: 4px;
+                margin: 8px 0
+            }
+
+            .steps span {
+                flex: 1;
+                height: 6px;
+                border-radius: 3px;
+                background: var(--line)
+            }
+
+            .steps span.on {
+                background: var(--ok)
+            }
+
+            select,input {
+                font: inherit;
+                padding: 8px 10px;
+                border: 1px solid var(--line);
+                border-radius: 9px;
+                background: var(--card);
+                color: var(--ink)
+            }
+
+            #chat {
+                max-height: 150px;
+                overflow: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                margin: 6px 0
+            }
+
+            .m {
+                padding: 6px 10px;
+                border-radius: 10px;
+                max-width: 82%;
+                background: var(--bld)
+            }
+
+            .m.me {
+                align-self: flex-end;
+                background: var(--acc);
+                color: var(--on-acc)
+            }
+
+            .stats {
+                display: grid;
+                grid-template-columns: repeat(2,1fr);
+                gap: 8px
+            }
+
+            .stat {
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                padding: 10px
+            }
+
+            .stat b {
+                font-size: 26px;
+                display: block
+            }
+
+            .notes {
+                font-size: 13px;
+                color: var(--mut);
+                margin: 0;
+                padding-left: 18px
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px
+            }
+
+            td,th {
+                text-align: left;
+                padding: 6px 4px;
+                border-bottom: 1px solid var(--line)
+            }
+
+            .mapwrap {
+                position: relative
+            }
+
+            .legend {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                display: flex;
+                gap: 12px;
+                font-size: 12px;
+                background: rgba(7,11,20,.75);
+                backdrop-filter: blur(6px);
+                padding: 6px 11px;
+                border-radius: 10px;
+                border: 1px solid var(--line)
+            }
+
+            .legend i {
+                display: inline-block;
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                margin-right: 5px
+            }
+
+            #dyn circle {
+                filter: drop-shadow(0 0 5px rgba(255,194,26,.55))
+            }
+
+            .pin:hover circle:first-child {
+                stroke: var(--acc)
+            }
+
+            .stat {
+                background: linear-gradient(160deg,rgba(255,194,26,.1),transparent);
+                border-radius: 14px
+            }
+
+            .stat b {
+                color: var(--acc)
+            }
+
+            .steps span {
+                height: 7px
+            }
+
+            .steps span.on {
+                background: linear-gradient(90deg,var(--ok),var(--acc))
+            }
+
+            select,input {
+                background: #0a111e
+            }
+
+            .li {
+                align-items: center
+            }
+
+            th {
+                color: var(--mut);
+                font-weight: 600
+            }
+
+            .tabs {
+                border: 1px solid rgba(255,255,255,.1);
+                overflow-x: auto
+            }
+
+            body:not(.in) header,body:not(.in) main,body:not(.in) #pg {
+                display: none
+            }
+
+            body.in #auth {
+                display: none
+            }
+
+            .av {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                border: 0;
+                background: var(--acc);
+                color: var(--on-acc);
+                font: inherit;
+                font-weight: 800;
+                cursor: pointer;
+                display: inline-grid;
+                place-items: center
+            }
+
+            .av.big {
+                width: 72px;
+                height: 72px;
+                font-size: 26px
+            }
+
+            #pg {
+                max-width: 1200px;
+                margin: auto;
+                padding: 18px 22px;
+                gap: 16px;
+                align-content: start
+            }
+
+            @media(max-width: 820px) {
+                #pg {
+                    padding:12px
+                }
+            }
+
+            .hero {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 16px;
+                background: linear-gradient(120deg,rgba(255,194,26,.16),rgba(46,204,143,.08)),var(--card)
+            }
+
+            .hero h1 {
+                margin: 0 0 6px;
+                font-size: 30px;
+                letter-spacing: -.02em
+            }
+
+            .hero p {
+                margin: 0 0 14px;
+                color: var(--mut);
+                max-width: 48ch
+            }
+
+            .g4 {
+                display: grid;
+                grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+                gap: 12px
+            }
+
+            .g2 {
+                display: grid;
+                grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+                gap: 16px
+            }
+
+            .chip {
+                border: 1px solid var(--line);
+                background: rgba(255,255,255,.03);
+                color: var(--ink);
+                padding: 8px 12px;
+                border-radius: 99px;
+                font: inherit;
+                cursor: pointer;
+                margin: 0 6px 8px 0
+            }
+
+            .chip:hover {
+                border-color: var(--acc)
+            }
+
+            .auth {
+                min-height: 100vh;
+                display: grid;
+                grid-template-columns: 1.1fr 1fr;
+                background: radial-gradient(700px 500px at 20% 10%,rgba(255,194,26,.16),transparent),var(--bg)
+            }
+
+            @media(max-width: 820px) {
+                .auth {
+                    grid-template-columns:1fr
+                }
+
+                .auth .side {
+                    display: none
+                }
+            }
+
+            .side {
+                padding: 56px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 14px
+            }
+
+            .side h1 {
+                font-size: 44px;
+                line-height: 1.05;
+                margin: 0;
+                letter-spacing: -.03em
+            }
+
+            .side p,.side li {
+                color: var(--mut)
+            }
+
+            .side ul {
+                padding-left: 18px;
+                margin: 0
+            }
+
+            .logo {
+                font-size: 22px;
+                font-weight: 800
+            }
+
+            .logo i {
+                font-style: normal;
+                background: var(--acc);
+                color: var(--on-acc);
+                padding: 0 7px;
+                border-radius: 6px;
+                margin-right: 6px
+            }
+
+            .fw {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px
+            }
+
+            .fw .card {
+                width: 100%;
+                max-width: 400px
+            }
+
+            label.f {
+                display: block;
+                font-size: 13px;
+                color: var(--mut);
+                margin: 10px 0 4px
+            }
+
+            label.f input,label.f select {
+                width: 100%;
+                margin-top: 4px
+            }
+
+            .seg {
+                display: flex;
+                background: #0a111e;
+                border-radius: 10px;
+                padding: 3px;
+                margin-bottom: 6px
+            }
+
+            .seg button {
+                flex: 1;
+                border: 0;
+                background: none;
+                color: var(--mut);
+                padding: 8px;
+                border-radius: 8px;
+                font: inherit;
+                font-weight: 600;
+                cursor: pointer
+            }
+
+            .seg button.on {
+                background: var(--card);
+                color: var(--ink)
+            }
+
+            .err {
+                color: var(--bad);
+                font-size: 13px;
+                min-height: 18px;
+                margin: 8px 0
+            }
+
+            .star {
+                background: none;
+                border: 0;
+                font-size: 18px;
+                cursor: pointer;
+                color: var(--line);
+                padding: 0
+            }
+
+            .star.on {
+                color: var(--acc)
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <b>
+                <i>CR</i>
+                CampusRide
+            </b>
+            <nav class="tabs" id="tabs"></nav>
+            <div class="row" id="usr"></div>
+        </header>
+        <main id="pg-book">
+            <section class="card mapwrap">
+                <svg id="map" viewBox="0 0 600 400" role="img" aria-label="Campus map"></svg>
+                <div class="legend">
+                    <span>
+                        <i style="background:#ffc21a"></i>
+                        Available
+                    </span>
+                    <span>
+                        <i style="background:#8896a8"></i>
+                        Busy
+                    </span>
+                    <span>
+                        <i style="background:#2ecc8f"></i>
+                        Pickup
+                    </span>
+                    <span>
+                        <i style="background:#ff5d6c"></i>
+                        Drop
+                    </span>
+                </div>
+                <div class="hint" id="hint"></div>
+            </section>
+            <section>
+                <div class="card" id="panel"></div>
+                <div class="card" style="margin-top:12px">
+                    <h3 style="margin-top:0">Live updates</h3>
+                    <ul class="notes" id="notes"></ul>
+                </div>
+            </section>
+        </main>
+        <div id="pg"></div>
+        <div id="auth"></div>
+        <script>
+            const L = [["Main Gate", 60, 340], ["Library", 260, 120], ["Hostel A", 100, 80], ["Hostel B", 480, 70], ["Engineering Block", 420, 200], ["Canteen", 250, 260], ["Sports Complex", 520, 340], ["Medical Centre", 140, 210]].map(a => ({
+                n: a[0],
+                x: a[1],
+                y: a[2]
+            }));
+            const S = {
+                role: "student",
+                pick: null,
+                drop: null,
+                radius: 1e9,
+                me: 0,
+                rides: [],
+                notes: [],
+                id: 1,
+                drivers: [{
+                    n: "Ravi K.",
+                    v: "Auto · MH02 4411",
+                    x: 200,
+                    y: 200,
+                    a: true,
+                    s: 4.8
+                }, {
+                    n: "Sana M.",
+                    v: "Cab · MH02 8120",
+                    x: 330,
+                    y: 300,
+                    a: true,
+                    s: 4.9
+                }, {
+                    n: "Imran S.",
+                    v: "Auto · MH02 7753",
+                    x: 90,
+                    y: 300,
+                    a: true,
+                    s: 4.6
+                }, {
+                    n: "Deepa R.",
+                    v: "Cab · MH02 3098",
+                    x: 450,
+                    y: 130,
+                    a: true,
+                    s: 4.7
+                }, {
+                    n: "Arjun P.",
+                    v: "E-rickshaw · MH02 6620",
+                    x: 300,
+                    y: 60,
+                    a: false,
+                    s: 4.5
+                }]
+            };
+            const M = 4
+              , SPEED = 9;
+            // 1 map unit = 4 m, speed units/sec
+            const $ = id => document.getElementById(id)
+              , d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+            const note = t => {
+                S.notes.unshift(t);
+                S.notes = S.notes.slice(0, 5);
+                $("notes").innerHTML = S.notes.map(n => "<li>" + n + "</li>").join("")
+            }
+            ;
+            const act = () => S.rides.find(r => ["requested", "accepted", "ongoing"].includes(r.st));
+            const meters = u => Math.round(u * M / 10) * 10;
+            const fare = r => 20 + Math.round(d(L[r.p], L[r.q]) * M / 1000 * 15);
+            const free = () => S.drivers.filter(x => x.a && !S.rides.some(r => r.dr === x && r.st !== "done" && r.st !== "cancelled") && true);
+            // ---- map
+            $("map").innerHTML = '<defs><pattern id="gr" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="var(--line)" stroke-width=".5" opacity=".6"/></pattern></defs><rect width="600" height="400" fill="url(#gr)"/><g fill="#0f3a2c" opacity=".75"><rect x="150" y="225" width="90" height="100" rx="16"/><rect x="500" y="100" width="70" height="90" rx="16"/></g><g stroke="var(--road)" stroke-width="16" fill="none" stroke-linecap="round"><path d="M40 340H560M40 210H560M40 80H560M100 60V360M260 40V370M480 60V360"/></g><g stroke="#ffc21a" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="6 8" fill="none"><path d="M40 340H560M40 210H560M40 80H560M100 60V360M260 40V370M480 60V360"/></g><g fill="var(--bld)"><rect x="285" y="95" width="50" height="30" rx="4"/><rect x="440" y="215" width="60" height="30" rx="4"/><rect x="40" y="130" width="40" height="50" rx="4"/><rect x="360" y="260" width="40" height="40" rx="4"/><rect x="300" y="215" width="50" height="35" rx="4"/></g><g id="dyn"></g>' + L.map( (l, i) => `<g class="pin" data-i="${i}" tabindex="0" role="button" aria-label="${l.n}"><circle cx="${l.x}" cy="${l.y}" r="9" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/><circle cx="${l.x}" cy="${l.y}" r="3" fill="var(--ink)"/><text x="${l.x}" y="${l.y - 14}" text-anchor="middle">${l.n}</text></g>`).join("");
+            function pick(i) {
+                if (S.role !== "student" || act())
+                    return;
+                if (S.pick == null || S.drop != null) {
+                    S.pick = i;
+                    S.drop = null
+                } else if (i !== S.pick)
+                    S.drop = i;
+                R()
+            }
+            $("map").addEventListener("click", e => {
+                const g = e.target.closest("[data-i]");
+                if (g)
+                    pick(+g.dataset.i)
+            }
+            );
+            $("map").addEventListener("keydown", e => {
+                if (e.key === "Enter") {
+                    const g = e.target.closest("[data-i]");
+                    if (g)
+                        pick(+g.dataset.i)
+                }
+            }
+            );
+            function drawDyn() {
+                const r = act() || (S.pick != null ? {
+                    p: S.pick,
+                    q: S.drop,
+                    st: "draft"
+                } : null);
+                let h = "";
+                if (r && r.q != null)
+                    h += `<line x1="${L[r.p].x}" y1="${L[r.p].y}" x2="${L[r.q].x}" y2="${L[r.q].y}" stroke="var(--ink)" stroke-width="3" stroke-dasharray="6 6"/>`;
+                if (r) {
+                    h += `<circle cx="${L[r.p].x}" cy="${L[r.p].y}" r="14" fill="none" stroke="#1f9d63" stroke-width="4"/>`;
+                    if (r.q != null)
+                        h += `<circle cx="${L[r.q].x}" cy="${L[r.q].y}" r="14" fill="none" stroke="#d64545" stroke-width="4"/>`
+                }
+                S.drivers.forEach( (x, i) => {
+                    const mine = r && r.dr === x
+                      , on = x.a;
+                    h += `<g><circle cx="${x.x}" cy="${x.y}" r="${mine ? 9 : 6}" fill="${on ? "#f5b301" : "#8896a8"}" stroke="${mine ? "var(--ink)" : "#fff"}" stroke-width="${mine ? 3 : 1.5}"/><text x="${x.x}" y="${x.y + 19}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--lab)">${x.n.split(" ")[0]}</text></g>`
+                }
+                );
+                $("dyn").innerHTML = h
+            }
+            // ---- simulation
+            setInterval( () => {
+                let ch = false;
+                S.drivers.forEach(x => {
+                    const r = S.rides.find(r => r.dr === x && (r.st === "accepted" || r.st === "ongoing"));
+                    if (r) {
+                        const t = L[r.st === "accepted" ? r.p : r.q]
+                          , D = d(x, t)
+                          , k = Math.min(1, SPEED * .1 / (D || 1));
+                        if (D > 1.5) {
+                            x.x += (t.x - x.x) * k;
+                            x.y += (t.y - x.y) * k
+                        } else if (!r.arr) {
+                            r.arr = 1;
+                            note(r.st === "accepted" ? x.n + " reached the pickup point" : "Arrived at " + t.n + " — driver can complete the ride");
+                            ch = true
+                        }
+                    } else if (x.a && Math.random() < .3) {
+                        x.x = Math.max(30, Math.min(570, x.x + Math.random() * 4 - 2));
+                        x.y = Math.max(30, Math.min(370, x.y + Math.random() * 4 - 2))
+                    }
+                }
+                );
+                drawDyn();
+                const r = act()
+                  , e = $("eta");
+                if (e && r && r.dr && !r.arr) {
+                    e.textContent = Math.max(1, Math.round(d(r.dr, L[r.st === "accepted" ? r.p : r.q]) / SPEED)) + " s (sim)"
+                }
+                if (ch)
+                    R();
+                if (S.role === "student" && !act())
+                    updNear()
+            }
+            , 100);
+            // ---- actions
+            function request() {
+                const rad = S.radius
+                  , c = free().filter(x => d(x, L[S.pick]) * M <= rad).sort( (a, b) => d(a, L[S.pick]) - d(b, L[S.pick])).slice(0, 3);
+                const r = {
+                    id: S.id++,
+                    p: S.pick,
+                    q: S.drop,
+                    st: "requested",
+                    offer: c,
+                    rej: [],
+                    dr: null,
+                    msgs: [],
+                    arr: 0
+                };
+                S.rides.unshift(r);
+                note(c.length ? "Ride request sent to " + c.map(x => x.n).join(", ") : "No drivers within range. Try a wider radius.");
+                if (!c.length)
+                    r.st = "cancelled";
+                R()
+            }
+            function accept(i) {
+                const r = S.rides.find(r => r.id === i);
+                r.dr = S.drivers[S.me];
+                r.st = "accepted";
+                r.offer = [];
+                r.dr.a = true;
+                note(r.dr.n + " accepted your ride — tracking live");
+                R()
+            }
+            function reject(i) {
+                const r = S.rides.find(r => r.id === i)
+                  , x = S.drivers[S.me];
+                r.offer = r.offer.filter(o => o !== x);
+                r.rej.push(x);
+                if (!r.offer.length) {
+                    const n = free().filter(o => !r.rej.includes(o)).sort( (a, b) => d(a, L[r.p]) - d(b, L[r.p]))[0];
+                    if (n) {
+                        r.offer = [n];
+                        note("Re-offered to " + n.n)
+                    } else {
+                        r.st = "cancelled";
+                        note("All drivers declined. Please request again.")
+                    }
+                }
+                R()
+            }
+            function start(i) {
+                const r = S.rides.find(r => r.id === i);
+                r.st = "ongoing";
+                r.arr = 0;
+                note("Ride started");
+                R()
+            }
+            function finish(i) {
+                const r = S.rides.find(r => r.id === i);
+                r.st = "done";
+                note("Ride completed · Fare ₹" + fare(r));
+                R()
+            }
+            function cancel(i) {
+                const r = S.rides.find(r => r.id === i);
+                r.st = "cancelled";
+                note("Ride cancelled");
+                R()
+            }
+            function send(i) {
+                const f = $("cin")
+                  , t = f.value.trim();
+                if (!t)
+                    return;
+                const r = S.rides.find(r => r.id === i);
+                r.msgs.push({
+                    f: S.role,
+                    t
+                });
+                f.value = "";
+                if (S.role === "student")
+                    setTimeout( () => {
+                        r.msgs.push({
+                            f: "driver",
+                            t: "Got it, on my way."
+                        });
+                        if (S.role !== "admin")
+                            chat(r)
+                    }
+                    , 1200);
+                chat(r)
+            }
+            function chat(r) {
+                const c = $("chat");
+                if (!c)
+                    return;
+                c.innerHTML = r.msgs.map(m => `<div class="m ${m.f === S.role ? "me" : ""}">${m.t.replace(/</g, "&lt;")}</div>`).join("") || '<span style="color:var(--mut)">No messages yet.</span>';
+                c.scrollTop = 1e5
+            }
+            const chatBox = r => `<h3>Chat</h3><div id="chat"></div><div class="row"><input id="cin" placeholder="Message" style="flex:1" onkeydown="if(event.key==='Enter')send(${r.id})"><button class="s" onclick="send(${r.id})">Send</button></div>`;
+            const stepBar = r => {
+                const o = ["requested", "accepted", "ongoing", "done"]
+                  , n = o.indexOf(r.st);
+                return `<div class="steps">${o.map( (_, i) => `<span class="${i <= n ? "on" : ""}"></span>`).join("")}</div>`
+            }
+            ;
+            function updNear() {
+                const e = $("near");
+                if (!e || S.pick == null)
+                    return;
+                const l = free().map(x => ({
+                    x,
+                    k: d(x, L[S.pick]) * M
+                })).filter(o => o.k <= S.radius).sort( (a, b) => a.k - b.k);
+                e.innerHTML = l.map(o => `<div class="li"><span>${o.x.n} <small style="color:var(--mut)">${o.x.v}</small></span><b>${meters(o.k / M)} m</b></div>`).join("") || '<div style="color:var(--mut)">No available drivers in range.</div>'
+            }
+            // ---- panels
+            function R() {
+                if (!S.user)
+                    return;
+                const p = $("panel")
+                  , r = act()
+                  , H = $("hint");
+                let h = "";
+                if (S.role === "student") {
+                    if (!r) {
+                        H.textContent = S.pick == null ? "Tap a place on the map to set your pickup." : S.drop == null ? "Now tap your drop-off." : "Ready — review and request.";
+                        const last = S.rides[0];
+                        h = `<h2>Book a ride</h2><div class="li"><span>Pickup</span><b>${S.pick != null ? L[S.pick].n : "—"}</b></div><div class="li"><span>Drop-off</span><b>${S.drop != null ? L[S.drop].n : "—"}</b></div>
+  <div class="row sp" style="margin-top:10px"><label>Driver radius <select onchange="S.radius=+this.value;updNear()"><option value="1000000000">Any</option><option value="300">300 m</option><option value="600">600 m</option><option value="1000">1 km</option></select></label></div>
+  <h3>Nearby drivers</h3><div id="near"></div>
+  ${S.drop != null ? `<p>Estimated fare <b>₹${fare({
+                            p: S.pick,
+                            q: S.drop
+                        })}</b></p>` : ""}
+  <div class="row"><button class="p" ${S.drop == null ? "disabled" : ""} onclick="request()">Request ride</button><button class="s" onclick="S.pick=S.drop=null;R()">Clear</button></div>
+  ${last && last.st === "done" ? `<p class="tag ok">Last ride completed · ₹${fare(last)}</p>` : ""}`
+                    } else {
+                        H.textContent = "Live tracking — the ringed driver is yours.";
+                        h = `<h2>${r.st === "requested" ? "Finding a driver…" : r.st === "accepted" ? "Driver on the way" : "Ride in progress"}</h2>${stepBar(r)}
+  <div class="li"><span>${L[r.p].n} → ${L[r.q].n}</span><b>₹${fare(r)}</b></div>
+  ${r.dr ? `<div class="li"><span>${r.dr.n} <small style="color:var(--mut)">${r.dr.v} · ★${r.dr.s}</small></span><b id="eta"></b></div>${chatBox(r)}` : `<p style="color:var(--mut)">Offer sent to ${r.offer.map(x => x.n).join(", ")}. Switch to the Driver tab to accept as one of them.</p>`}
+  ${r.st === "requested" ? `<button class="s" onclick="cancel(${r.id})">Cancel request</button>` : ""}`
+                    }
+                } else if (S.role === "driver") {
+                    const me = S.drivers[S.me]
+                      , job = S.rides.find(r => r.dr === me && (r.st === "accepted" || r.st === "ongoing"))
+                      , offers = S.rides.filter(r => r.st === "requested" && r.offer.includes(me));
+                    H.textContent = "Driver view — pickup and drop-off are shown on the map.";
+                    h = `<h2>Driver dashboard</h2><div class="row sp"><label>Signed in as <select onchange="S.me=+this.value;R()">${S.drivers.map( (x, i) => `<option value="${i}" ${i === S.me ? "selected" : ""}>${x.n}</option>`).join("")}</select></label>
+ <button class="s" onclick="S.drivers[S.me].a=!S.drivers[S.me].a;R()">${me.a ? "Go offline" : "Go online"}</button></div>
+ <p><span class="tag ${me.a ? "ok" : ""}">${me.a ? "Online" : "Offline"}</span> <small style="color:var(--mut)">Sharing live GPS</small></p>
+ ${job ? `<h3>Current ride</h3><div class="li"><span>${L[job.p].n} → ${L[job.q].n}</span><b>₹${fare(job)}</b></div>${stepBar(job)}<div class="row">
+  ${job.st === "accepted" ? `<button class="p" ${job.arr ? "" : "disabled"} onclick="start(${job.id})">Start ride</button>` : `<button class="p" ${job.arr ? "" : "disabled"} onclick="finish(${job.id})">Complete ride</button>`}</div>${chatBox(job)}` : `<h3>Incoming requests</h3>${offers.map(o => `<div class="li"><span>${L[o.p].n} → ${L[o.q].n}<br><small style="color:var(--mut)">${meters(d(me, L[o.p]))} m from you · ₹${fare(o)}</small></span><span class="row"><button class="p" onclick="accept(${o.id})">Accept</button><button class="s" onclick="reject(${o.id})">Reject</button></span></div>`).join("") || '<div style="color:var(--mut)">No requests right now. Book a ride from the Student tab.</div>'}`}`
+                } else {
+                    H.textContent = "Admin view — all drivers and ride activity.";
+                    const done = S.rides.filter(r => r.st === "done").length;
+                    h = `<h2>Admin dashboard</h2><div class="stats"><div class="stat"><b>${S.rides.length}</b>Total rides</div><div class="stat"><b>${S.rides.filter(r => ["requested", "accepted", "ongoing"].includes(r.st)).length}</b>Active now</div><div class="stat"><b>${S.drivers.filter(x => x.a).length}/${S.drivers.length}</b>Drivers online</div><div class="stat"><b>₹${S.rides.filter(r => r.st === "done").reduce( (s, r) => s + fare(r), 0)}</b>Earned (${done} done)</div></div>
+ <h3>Drivers</h3><table><tr><th>Name</th><th>Vehicle</th><th>Status</th></tr>${S.drivers.map(x => `<tr><td>${x.n}</td><td>${x.v}</td><td>${x.a ? "Online" : "Offline"}</td></tr>`).join("")}</table>
+ <h3>Rides</h3><table><tr><th>#</th><th>Route</th><th>Status</th></tr>${S.rides.map(r => `<tr><td>${r.id}</td><td>${L[r.p].n} → ${L[r.q].n}</td><td>${r.st}</td></tr>`).join("") || '<tr><td colspan="3" style="color:var(--mut)">No rides yet.</td></tr>'}</table>`
+                }
+                p.innerHTML = h;
+                const cr = S.rides.find(x => x === r || (S.role === "driver" && x.dr === S.drivers[S.me] && (x.st === "accepted" || x.st === "ongoing")));
+                if (cr && cr.dr)
+                    chat(cr);
+                updNear();
+                drawDyn()
+            }
+            const ls = {
+                get(k) {
+                    try {
+                        return JSON.parse(localStorage.getItem(k))
+                    } catch (e) {
+                        return null
+                    }
+                },
+                set(k, v) {
+                    try {
+                        localStorage.setItem(k, JSON.stringify(v))
+                    } catch (e) {}
+                }
+            };
+            const DEPT = ["Computer Science", "Mechanical", "Electronics", "Civil", "Management", "Sciences"];
+            S.users = ls.get("cr_users") || [{
+                name: "Aarav Sharma",
+                email: "student@campus.edu",
+                pw: "1234",
+                role: "student",
+                phone: "98200 11223",
+                dept: "Computer Science",
+                emg: ""
+            }, {
+                name: "Ravi Kumar",
+                email: "driver@campus.edu",
+                pw: "1234",
+                role: "driver",
+                phone: "98200 44556",
+                dept: "Transport",
+                emg: ""
+            }, {
+                name: "Campus Admin",
+                email: "admin@campus.edu",
+                pw: "1234",
+                role: "admin",
+                phone: "98200 77889",
+                dept: "Administration",
+                emg: ""
+            }];
+            S.page = "home";
+            S.user = null;
+            const ini = n => n.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
+              , esc = s => String(s || "").replace(/[&<>"]/g, c => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;"
+            }[c]));
+            const stat = (a, b) => `<div class="stat"><b>${a}</b>${b}</div>`;
+            function authUI(m) {
+                const g = m === "reg";
+                $("auth").innerHTML = `<div class="auth"><div class="side"><span class="logo"><i>CR</i>CampusRide</span><h1>Get across campus in minutes.</h1><p>Book a ride from the library to your hostel, watch your driver arrive live, and chat if plans change.</p><ul><li>Drivers matched by distance</li><li>Live GPS tracking</li><li>Chat and ride updates</li></ul></div>
+<div class="fw"><div class="card" onkeydown="if(event.key==='Enter')${g ? "doReg()" : "doLogin()"}"><div class="seg"><button class="${g ? "" : "on"}" onclick="authUI('login')">Log in</button><button class="${g ? "on" : ""}" onclick="authUI('reg')">Register</button></div>
+${g ? `<label class="f">Full name<input id="an"></label><label class="f">Phone<input id="aph" inputmode="tel"></label>` : ""}
+<label class="f">Email<input id="ae" type="email" value="${g ? "" : "student@campus.edu"}"></label><label class="f">Password<input id="ap" type="password" value="${g ? "" : "1234"}"></label>
+${g ? `<label class="f">I am a<select id="ar"><option value="student">Student</option><option value="driver">Driver</option></select></label><label class="f">Department<select id="ad">${DEPT.map(x => `<option>${x}</option>`).join("")}</select></label>` : ""}
+<div class="err" id="aerr"></div><button class="p" style="width:100%" onclick="${g ? "doReg()" : "doLogin()"}">${g ? "Create account" : "Log in"}</button>
+${g ? "" : `<h3>Or try a demo account</h3><div class="row">${["student", "driver", "admin"].map(r => `<button class="chip" onclick="demo('${r}')">${r}</button>`).join("")}</div>`}</div></div></div>`
+            }
+            function doLogin() {
+                const u = S.users.find(x => x.email === $("ae").value.trim().toLowerCase() && x.pw === $("ap").value);
+                u ? enter(u) : $("aerr").textContent = "Email or password is incorrect."
+            }
+            function doReg() {
+                const n = $("an").value.trim()
+                  , e = $("ae").value.trim().toLowerCase()
+                  , p = $("ap").value
+                  , er = $("aerr");
+                if (n.length < 2)
+                    return er.textContent = "Enter your full name.";
+                if (!/^\S+@\S+\.\S+$/.test(e))
+                    return er.textContent = "Enter a valid email address.";
+                if (p.length < 4)
+                    return er.textContent = "Password needs at least 4 characters.";
+                if (S.users.some(x => x.email === e))
+                    return er.textContent = "This email is already registered. Log in instead.";
+                const u = {
+                    name: n,
+                    email: e,
+                    pw: p,
+                    role: $("ar").value,
+                    phone: $("aph").value,
+                    dept: $("ad").value,
+                    emg: ""
+                };
+                S.users.push(u);
+                ls.set("cr_users", S.users);
+                enter(u)
+            }
+            const demo = r => enter(S.users.find(u => u.role === r));
+            function enter(u) {
+                S.user = u;
+                S.role = u.role;
+                ls.set("cr_session", u.email);
+                document.body.classList.add("in");
+                S.notes = [];
+                note("Welcome, " + u.name.split(" ")[0] + ". You are signed in as " + u.role + ".");
+                go("home")
+            }
+            function logout() {
+                ls.set("cr_session", null);
+                S.user = null;
+                S.pick = S.drop = null;
+                document.body.classList.remove("in");
+                authUI("login");
+                scrollTo(0, 0)
+            }
+            function boot() {
+                const e = ls.get("cr_session")
+                  , u = e && S.users.find(x => x.email === e);
+                u ? enter(u) : authUI("login")
+            }
+            function go(p) {
+                S.page = p;
+                renderNav();
+                $("pg-book").style.display = p === "book" ? "" : "none";
+                $("pg").style.display = p === "book" ? "none" : "grid";
+                p === "book" ? R() : renderPage();
+                scrollTo(0, 0)
+            }
+            function renderNav() {
+                const r = S.role
+                  , it = [["home", "Home"], ["book", r === "student" ? "Book a ride" : r === "driver" ? "Dashboard" : "Admin"], ["rides", r === "admin" ? "All rides" : "My rides"], ["profile", "Profile"]];
+                $("tabs").innerHTML = it.map(i => `<button data-p="${i[0]}" class="${S.page === i[0] ? "on" : ""}">${i[1]}</button>`).join("");
+                $("usr").innerHTML = `<button class="av" onclick="go('profile')" aria-label="Profile">${ini(S.user.name)}</button><button class="s" style="color:#fff" onclick="logout()">Log out</button>`
+            }
+            $("tabs").onclick = e => {
+                const b = e.target.closest("button");
+                if (b)
+                    go(b.dataset.p)
+            }
+            ;
+            const setRole = x => {
+                S.role = x;
+                renderNav();
+                renderPage()
+            }
+              , quick = (a, b) => {
+                if (S.role === "student" && !act()) {
+                    S.pick = a;
+                    S.drop = b
+                }
+                go("book")
+            }
+            ;
+            const rate = (i, n) => {
+                S.rides.find(r => r.id === i).rt = n;
+                note("Thanks for rating your ride " + n + " ★");
+                renderPage()
+            }
+            ;
+            function saveProfile() {
+                const u = S.user;
+                u.name = $("pn").value.trim() || u.name;
+                u.phone = $("pp").value;
+                u.dept = $("pd").value;
+                u.emg = $("pe").value;
+                ls.set("cr_users", S.users);
+                renderNav();
+                $("pmsg").textContent = "Profile saved.";
+            }
+            function renderPage() {
+                const u = S.user
+                  , r = S.role
+                  , done = S.rides.filter(x => x.st === "done")
+                  , paid = done.reduce( (s, x) => s + fare(x), 0)
+                  , on = S.drivers.filter(x => x.a).length;
+                let h = "";
+                if (S.page === "home") {
+                    const hr = new Date().getHours()
+                      , g = hr < 12 ? "Good morning" : hr < 17 ? "Good afternoon" : "Good evening"
+                      , st = r === "student" ? [stat(done.length, "Rides taken"), stat("₹" + paid, "Spent"), stat(on, "Drivers online"), stat(S.rides.filter(x => x.st === "cancelled").length, "Cancelled")] : r === "driver" ? [stat(done.length, "Rides completed"), stat("₹" + paid, "Earnings"), stat("4.8 ★", "Rating"), stat(S.drivers[S.me].a ? "Online" : "Offline", "Status")] : [stat(S.rides.length, "Total rides"), stat(S.drivers.length, "Drivers"), stat(on, "Online now"), stat("₹" + paid, "Revenue")];
+                    h = `<div class="card hero"><div><h1>${g}, ${esc(u.name.split(" ")[0])}</h1><p>${r === "student" ? "Where to today? Pick a route below or choose any two places on the map." : r === "driver" ? "Go online to start receiving ride requests near you." : "Monitor drivers, riders and live ride activity across campus."}</p><button class="p" onclick="go('book')">${r === "student" ? "Book a ride" : r === "driver" ? "Open dashboard" : "Open admin panel"}</button></div></div>
+<div class="g4">${st.join("")}</div>
+<div class="g2"><div class="card"><h2>Popular routes</h2>${[[0, 1], [2, 4], [5, 6], [7, 3]].map(x => `<button class="chip" onclick="quick(${x[0]},${x[1]})">${L[x[0]].n} → ${L[x[1]].n}</button>`).join("")}<h3>Fares</h3><p style="margin:0;color:var(--mut)">₹20 base plus ₹15 per km, shown before you confirm.</p></div>
+<div class="card"><h2>Recent rides</h2>${S.rides.slice(0, 4).map(x => `<div class="li"><span>${L[x.p].n} → ${L[x.q].n}</span><span class="tag ${x.st === "done" ? "ok" : x.st === "cancelled" ? "bad" : "acc"}">${x.st === "done" ? "completed" : x.st}</span></div>`).join("") || '<p style="color:var(--mut)">No rides yet. Your first trip will appear here.</p>'}</div></div>
+<div class="card"><h2>Campus notices</h2><div class="li"><span>Night shuttle runs until 11 pm during exam week</span><span class="tag">Transport</span></div><div class="li"><span>Sports Complex road closed Friday 2–4 pm</span><span class="tag">Safety</span></div></div>`
+                } else if (S.page === "rides") {
+                    h = `<div class="card"><h2>${r === "admin" ? "All rides" : "Ride history"}</h2>${S.rides.length ? `<div style="overflow-x:auto"><table><tr><th>#</th><th>Route</th><th>Driver</th><th>Fare</th><th>Status</th><th>Rating</th></tr>${S.rides.map(x => `<tr><td>${x.id}</td><td>${L[x.p].n} → ${L[x.q].n}</td><td>${x.dr ? x.dr.n : "—"}</td><td>₹${fare(x)}</td><td><span class="tag ${x.st === "done" ? "ok" : x.st === "cancelled" ? "bad" : "acc"}">${x.st === "done" ? "completed" : x.st}</span></td><td>${x.st === "done" && r === "student" ? [1, 2, 3, 4, 5].map(n => `<button class="star ${n <= (x.rt || 0) ? "on" : ""}" onclick="rate(${x.id},${n})" aria-label="${n} stars">★</button>`).join("") : x.rt ? x.rt + " ★" : "—"}</td></tr>`).join("")}</table></div>` : `<p style="color:var(--mut)">No rides yet. Your trips will show up here.</p><button class="p" onclick="go('book')">Book your first ride</button>`}</div>`
+                } else {
+                    h = `<div class="g2"><div class="card"><div class="row"><span class="av big">${ini(u.name)}</span><div><h2 style="margin:0">${esc(u.name)}</h2><div style="color:var(--mut)">${esc(u.email)}</div><span class="tag acc">${r}</span></div></div>
+<label class="f">Full name<input id="pn" value="${esc(u.name)}"></label><label class="f">Phone<input id="pp" value="${esc(u.phone)}"></label><label class="f">Department<input id="pd" value="${esc(u.dept)}"></label><label class="f">Emergency contact<input id="pe" value="${esc(u.emg)}" placeholder="Name and phone"></label>
+<div class="err" id="pmsg" style="color:var(--ok)"></div><div class="row"><button class="p" onclick="saveProfile()">Save changes</button><button class="s" onclick="logout()">Log out</button></div></div>
+<div class="card"><h2>Your activity</h2><div class="g4" style="grid-template-columns:1fr 1fr">${stat(done.length, "Rides completed")}${stat("₹" + paid, r === "driver" ? "Earned" : "Spent")}</div>
+<h3>Demo mode</h3><p style="color:var(--mut);margin:0 0 8px">Switch roles to show the full ride flow in one session.</p><div class="row">${["student", "driver", "admin"].map(x => `<button class="${x === r ? "p" : "s"}" onclick="setRole('${x}')">${x}</button>`).join("")}</div></div></div>`
+                }
+                $("pg").innerHTML = h
+            }
+
+            boot();
+        </script>
+    </body>
+</html>
